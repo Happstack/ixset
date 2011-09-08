@@ -358,11 +358,9 @@ inferIxSet ixset typeName calName entryPoints
                                                              appT (appT (conT ''Map) (conT n)) 
                                                                       (appT (conT ''Set) typeCon))) `appE` 
                                     (varE 'flattenWithCalcs `appE` varE calName)
-               in do i <- instanceD' (fullContext) 
+               in do i <- instanceD (fullContext)
                           (conT ''Indexable `appT` typeCon)
-                          [d| empty :: IxSet a
-                              empty = ixSet $(listE (map mkEntryPoint entryPoints))
-                            |]
+                          [valD (varP 'empty) (normalB [| ixSet $(listE (map mkEntryPoint entryPoints)) |]) []]
                      let ixType = appT (conT ''IxSet) typeCon
                      ixType' <- tySynD (mkName ixset) binders ixType
                      return $ [i, ixType']  -- ++ d
