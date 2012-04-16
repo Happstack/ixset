@@ -149,7 +149,7 @@ module Data.IxSet
      flatten,
      flattenWithCalcs,
 
-     -- * Debugging and optimisation
+     -- * Debugging and optimization
      stats
 )
 where
@@ -186,11 +186,11 @@ asProxyType a _ = a
 
 -- the core datatypes
 
--- | Set with associatex indexes. 
+-- | Set with associated indexes. 
 data IxSet a = IxSet [Ix a]
     deriving (Data, Typeable)
 
--- | Create an 'IxSet' using a list of indexes. Useful in 'Indexable'
+-- | Create an 'IxSet' using a list of indexes. Useful in the 'Indexable'
 -- 'empty' method. Use 'ixFun' and 'ixGen' as list elements.
 --
 -- > instance Indexable Type where
@@ -199,13 +199,13 @@ data IxSet a = IxSet [Ix a]
 -- >                     ixGen (Proxy :: Proxy Index2Type)
 -- >                   ]
 --
--- First index in the list must contain all objects in set, doing
--- otherwise result in runtime error.
+-- Every value in the 'IxSet' must be reachable by the first index in this
+-- list, or you'll get a runtime error.
 ixSet :: [Ix a] -> IxSet a
 ixSet = IxSet
 
 -- | Create a functional index. Provided function should return a list
--- of indexes where value should be found. 
+-- of indexes where the value should be found. 
 --
 -- > getIndexes value = [...indexes...]
 --
@@ -217,9 +217,9 @@ ixFun :: forall a b . (Ord b,Typeable b) => (a -> [b]) -> Ix a
 ixFun f = Ix Map.empty f
 
 
--- | Create a generic index. Provided example is used only as type
--- source so you may use a 'Proxy'. The 'ixGen' uses flatten to
--- traverse value using its 'Data' instance.
+-- | Create a generic index. Provided example is used only as type source
+-- so you may use a 'Proxy'. This uses flatten to traverse values using
+-- their 'Data' instances.
 --
 -- > instance Indexable Type where
 -- >     empty = ixSet [ ixGen (Proxy :: Proxy Type) ]
@@ -283,13 +283,12 @@ instance (Ord a,Show a) => Show (IxSet a) where
 instance (Ord a,Read a,Typeable a,Indexable a) => Read (IxSet a) where
     readsPrec n = map (first fromSet) . readsPrec n
 
-{- | 'Indexable' class defines objects that can be members of 'IxSet'. 
+{- | Defines objects that can be members of 'IxSet'. 
 -}
 class Indexable a where
-    -- | Method 'empty' defines what an empty 'IxSet' for this
-    -- particular type should look like.  It should have all necessary
-    -- indexes. Use 'ixSet' function to create the set and fill it in
-    -- with 'ixFun' and 'ixGen'.
+    -- | Defines what an empty 'IxSet' for this particular type should look
+    -- like.  It should have all necessary indexes. Use the 'ixSet'
+    -- function to create the set and fill it in with 'ixFun' and 'ixGen'.
     empty :: IxSet a
            
 -- | Function to be used for 'calcs' in 'inferIxSet' when you don't
@@ -312,10 +311,10 @@ will build a type synonym
    
 with @Int@ and @String@ as indexes.
 
-WARNING: The type specified as the first index must be a type which
+/WARNING/: The type specified as the first index must be a type which
 appears in all values in the 'IxSet' or 'toList', 'toSet' and
-serialization will not function properly. You will be warned not to do
-this by runtime error.  You can always use the element type
+serialization will not function properly.  You will be warned not to do
+this with a runtime error.  You can always use the element type
 itself. For example:
 
 > $(inferIxSet "FooDB" ''Foo 'noCalcs [''Foo, ''Int, ''String])
@@ -367,14 +366,14 @@ inferIxSet ixset typeName calName entryPoints
            _ -> error "IxSet.inferIxSet calInfo unexpected match"
 
 -- | Version of 'instanceD' that takes in a Q [Dec] instead of a [Q Dec]
--- and filters out signatures from the list of declarations
+-- and filters out signatures from the list of declarations.
 instanceD' :: CxtQ -> TypeQ -> Q [Dec] -> DecQ
 instanceD' ctxt ty decs =
     do decs' <- decs
        let decs'' = filter (not . isSigD) decs'
        instanceD ctxt ty (map return decs'')
 
--- | Returns true if the Dec matches a SigD constructor
+-- | Returns true if the Dec matches a SigD constructor.
 isSigD :: Dec -> Bool
 isSigD (SigD _ _) = True
 isSigD _ = False
@@ -477,7 +476,7 @@ insertMapOfSets originalindex (IxSet indexes) =
                    Nothing -> Ix.insertList dss index
 
 -- | Inserts an item into the 'IxSet'. If your data happens to have
--- primary key this function might not be what you want. See
+-- a primary key this function might not be what you want. See
 -- 'updateIx'.
 insert :: (Typeable a, Ord a,Indexable a) => a -> IxSet a -> IxSet a
 insert = change Ix.insert
@@ -549,7 +548,7 @@ getOne ixset = case toList ixset of
                    [x] -> Just x
                    _   -> Nothing
 
--- | Like 'getOne' with a user provided default.
+-- | Like 'getOne' with a user-provided default.
 getOneOr :: Ord a => a -> IxSet a -> a
 getOneOr def = fromMaybe def . getOne
 

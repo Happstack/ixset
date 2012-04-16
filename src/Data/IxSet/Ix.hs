@@ -4,8 +4,8 @@
 
 {- |
 
-This module defines typable indices and convenience functions. Should
-be probably considered private to 'Happstack.Data.IxSet'.
+This module defines 'Typeable' indexes and convenience functions. Should
+be probably considered private to "Data.IxSet".
 
 -}
 module Data.IxSet.Ix 
@@ -87,12 +87,12 @@ deleteList :: (Ord a, Ord k)
            => [(k,a)] -> Map k (Set a) -> Map k (Set a)
 deleteList xs index = foldl' (\m (k,v) -> delete k v m) index xs
 
--- | Take union of two sets.
+-- | Takes the union of two sets.
 union :: (Ord a, Ord k)
        => Map k (Set a) -> Map k (Set a) -> Map k (Set a)
 union index1 index2 = Map.unionWith Set.union index1 index2
 
--- | Take intersection of two sets
+-- | Takes the intersection of two sets.
 intersection :: (Ord a, Ord k)
              => Map k (Set a) -> Map k (Set a) -> Map k (Set a)
 intersection index1 index2 = Map.filter (not . Set.null) $ 
