@@ -5,7 +5,7 @@
 {- |
 
 This module defines 'Typeable' indexes and convenience functions. Should
-be probably considered private to "Data.IxSet".
+probably be considered private to "Data.IxSet".
 
 -}
 module Data.IxSet.Ix 
