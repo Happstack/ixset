@@ -1,5 +1,5 @@
 Name:                ixset
-Version:             1.0.2
+Version:             1.0.3
 Synopsis:            Efficient relational queries on Haskell sets.
 Description:
     Create and query sets that are indexed by multiple indices.
@@ -37,7 +37,7 @@ Library
                        template-haskell
 
   hs-source-dirs:      src
-  Exposed-modules:     
+  Exposed-modules:
                        Data.IxSet
                        Data.IxSet.Ix
 

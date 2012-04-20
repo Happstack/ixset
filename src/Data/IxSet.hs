@@ -19,7 +19,7 @@ Assume you have a type like:
 an instance of 'Indexable'. Use 'ixFun' and 'ixGen' to build indexes:
 
 > instance Indexable Entry where
->     empty = ixSet 
+>     empty = ixSet
 >               [ ixGen (Proxy :: Proxy Author)        -- out of order
 >               , ixGen (Proxy :: Proxy Id)
 >               , ixGen (Proxy :: Proxy Updated)
@@ -68,7 +68,7 @@ the first author only, define a @FirstAuthor@ datatype and create an
 index with this type.  Now you can do:
 
 > newtype FirstAuthor = FirstAuthor Email
->   
+>
 > getFirstAuthor (Entry author _ _ _ _) = [FirstAuthor author]
 >
 > instance Indexable Entry where
@@ -81,7 +81,7 @@ index with this type.  Now you can do:
 
 -}
 
-module Data.IxSet 
+module Data.IxSet
     (
      -- * Set type
      IxSet,
@@ -92,7 +92,7 @@ module Data.IxSet
      ixSet,
      ixFun,
      ixGen,
-               
+
      -- * Changes to set
      IndexOp,
      change,
@@ -186,7 +186,7 @@ asProxyType a _ = a
 
 -- the core datatypes
 
--- | Set with associated indexes. 
+-- | Set with associated indexes.
 data IxSet a = IxSet [Ix a]
     deriving (Data, Typeable)
 
@@ -205,7 +205,7 @@ ixSet :: [Ix a] -> IxSet a
 ixSet = IxSet
 
 -- | Create a functional index. Provided function should return a list
--- of indexes where the value should be found. 
+-- of indexes where the value should be found.
 --
 -- > getIndexes value = [...indexes...]
 --
@@ -233,7 +233,7 @@ showTypeOf :: (Typeable a) => a -> String
 showTypeOf x = showsPrec 11 (typeOf x) []
 
 instance (Eq a,Ord a,Typeable a) => Eq (IxSet a) where
-    IxSet (Ix a _:_) == IxSet (Ix b _:_) = 
+    IxSet (Ix a _:_) == IxSet (Ix b _:_) =
         case cast b of
           Just b' -> a==b'
           Nothing -> error "trying to compare two sets with different types of first indexes, this is a bug in the library"
@@ -277,20 +277,20 @@ ixSetDataType = SYBWC.mkDataType "IxSet" [ixSetConstr]
 instance (Indexable a, Ord a,Data a, Default a) => Default (IxSet a) where
     defaultValue = empty
 -}
-instance (Ord a,Show a) => Show (IxSet a) where 
+instance (Ord a,Show a) => Show (IxSet a) where
     showsPrec prec = showsPrec prec . toSet
 
 instance (Ord a,Read a,Typeable a,Indexable a) => Read (IxSet a) where
     readsPrec n = map (first fromSet) . readsPrec n
 
-{- | Defines objects that can be members of 'IxSet'. 
+{- | Defines objects that can be members of 'IxSet'.
 -}
 class Indexable a where
     -- | Defines what an empty 'IxSet' for this particular type should look
     -- like.  It should have all necessary indexes. Use the 'ixSet'
     -- function to create the set and fill it in with 'ixFun' and 'ixGen'.
     empty :: IxSet a
-           
+
 -- | Function to be used for 'calcs' in 'inferIxSet' when you don't
 -- want any calculated values.
 noCalcs :: t -> ()
@@ -300,15 +300,15 @@ noCalcs _ = ()
 'Indexable' instance from a data type, e.g.
 
 > data Foo = Foo Int String
-   
+
 and
-   
+
 > $(inferIxSet "FooDB" ''Foo 'noCalcs [''Int,''String])
-   
-will build a type synonym 
+
+will build a type synonym
 
 > type FooDB = IxSet Foo
-   
+
 with @Int@ and @String@ as indexes.
 
 /WARNING/: The type specified as the first index must be a type which
@@ -319,7 +319,7 @@ itself. For example:
 
 > $(inferIxSet "FooDB" ''Foo 'noCalcs [''Foo, ''Int, ''String])
 
--} 
+-}
 inferIxSet :: String -> TH.Name -> TH.Name -> [TH.Name] -> Q [Dec]
 inferIxSet _ _ _ [] = error "inferIxSet needs at least one index"
 inferIxSet ixset typeName calName entryPoints
@@ -352,10 +352,10 @@ inferIxSet ixset typeName calName entryPoints
                    getCalType (ForallT _names _ t') = getCalType t'
                    getCalType (AppT (AppT ArrowT _) t') = t'
                    getCalType t' = error ("Unexpected type in getCalType: " ++ pprint t')
-                   mkEntryPoint n = (conE 'Ix) `appE` 
+                   mkEntryPoint n = (conE 'Ix) `appE`
                                     (sigE (varE 'Map.empty) (forallT binders (return context) $
-                                                             appT (appT (conT ''Map) (conT n)) 
-                                                                      (appT (conT ''Set) typeCon))) `appE` 
+                                                             appT (appT (conT ''Map) (conT n))
+                                                                      (appT (conT ''Set) typeCon))) `appE`
                                     (varE 'flattenWithCalcs `appE` varE calName)
                in do i <- instanceD (fullContext)
                           (conT ''Indexable `appT` typeCon)
@@ -410,7 +410,7 @@ flatten x = case cast x of
 -- | Generically traverses the argument and calculated values to find
 -- all occurences of values of type @b@ and returns them as a
 -- list. Equivalent to:
--- 
+--
 -- > flatten (x,calcs x)
 --
 -- This function properly handles 'String' as 'String' not as @['Char']@.
@@ -422,7 +422,7 @@ flattenWithCalcs calcs x = flatten (x,calcs x)
 -- e.g. 'insert' or 'delete'.
 change :: (Typeable a,Indexable a,Ord a) =>
           IndexOp -> a -> IxSet a -> IxSet a
-change op x (IxSet indexes) = 
+change op x (IxSet indexes) =
     IxSet v
     where
     v = zipWith update (True:repeat False) indexes
@@ -435,9 +435,9 @@ change op x (IxSet indexes) =
                  then error $ "Happstack.Data.IxSet.change: all values must appear in first declared index " ++ showTypeOf key ++ " of " ++ showTypeOf x
                  else List.foldl' ii index ds -- handle multiple values
 
-insertList :: (Typeable a,Indexable a,Ord a) 
+insertList :: (Typeable a,Indexable a,Ord a)
            => [a] -> IxSet a -> IxSet a
-insertList xs (IxSet indexes) = 
+insertList xs (IxSet indexes) =
     IxSet v
     where
     v = zipWith update (True:repeat False) indexes
@@ -452,9 +452,9 @@ insertList xs (IxSet indexes) =
         dss = [(k,x) | x <- xs, k <- flattencheck x]
         index' = Ix.insertList dss index
 
-insertMapOfSets :: (Typeable a, Ord a,Indexable a,Typeable key,Ord key) 
+insertMapOfSets :: (Typeable a, Ord a,Indexable a,Typeable key,Ord key)
                 => Map key (Set a) -> IxSet a -> IxSet a
-insertMapOfSets originalindex (IxSet indexes) = 
+insertMapOfSets originalindex (IxSet indexes) =
     IxSet v
     where
     v = map update indexes
@@ -466,11 +466,11 @@ insertMapOfSets originalindex (IxSet indexes) =
            from original index. We want to reuse it as much as possible. If there
            was a guarantee that each element is present at at most one index we
            could reuse originalindex as it is. But there can be more, so we need to
-           add remaining ones. Anyway we try to reuse old structure and keep 
+           add remaining ones. Anyway we try to reuse old structure and keep
            new allocations low as much as possible.
          -}
         index' = case cast originalindex of
-                   Just originalindex' -> 
+                   Just originalindex' ->
                        let dssf = filter (\(k,_v) -> not (Map.member k originalindex')) dss
                        in Ix.insertList dssf originalindex'
                    Nothing -> Ix.insertList dss index
@@ -575,7 +575,7 @@ union :: (Ord a, Typeable a, Indexable a) => IxSet a -> IxSet a -> IxSet a
 union (IxSet x1) (IxSet x2) = IxSet indexes'
     where
       indexes' = zipWith union' x1 x2
-      union' (Ix a f) (Ix b _) = 
+      union' (Ix a f) (Ix b _) =
           case cast b of
             Nothing -> error "IxSet.union: indexes out of order"
             Just b' -> Ix (Ix.union a b') f
@@ -585,7 +585,7 @@ intersection :: (Ord a, Typeable a, Indexable a) => IxSet a -> IxSet a -> IxSet 
 intersection (IxSet x1) (IxSet x2) = IxSet indexes'
     where
       indexes' = zipWith intersection' x1 x2
-      intersection' (Ix a f) (Ix b _) = 
+      intersection' (Ix a f) (Ix b _) =
           case cast b of
             Nothing -> error "IxSet.intersection: indexes out of order"
             Just b' -> Ix (Ix.intersection a b') f
@@ -716,7 +716,7 @@ groupAscBy (IxSet indexes) = collect indexes
 -- type inference.
 --
 -- The resulting list will be sorted in descending order by 'k'.
--- 
+--
 -- NOTE: The values in '[t]' are currently sorted in ascending
 -- order. But this may change if someone bothers to add
 -- 'Set.toDescList'. So do not rely on the sort order of '[t]'.
@@ -726,7 +726,7 @@ groupDescBy (IxSet indexes) = collect indexes
     collect [] = [] -- FIXME: should be an error
     collect (Ix index _:is) = maybe (collect is) f (cast index)
     f = map (second Set.toAscList) . Map.toDescList
-    
+
 --query impl function
 
 -- | A function for building up selectors on 'IxSet's.  Used in the
@@ -746,7 +746,7 @@ getOrd2 :: (Indexable a, Ord a, Typeable a, Typeable k)
         => Bool -> Bool -> Bool -> k -> IxSet a -> IxSet a
 getOrd2 inclt inceq incgt v ixset@(IxSet indexes) = collect indexes
     where
-    collect [] = error $ "IxSet: there is no index " ++ showTypeOf v ++ 
+    collect [] = error $ "IxSet: there is no index " ++ showTypeOf v ++
                  " in " ++ showTypeOf ixset
     collect (Ix index _:is) = maybe (collect is) f $ cast v
         where
@@ -756,11 +756,11 @@ getOrd2 inclt inceq incgt v ixset@(IxSet indexes) = collect indexes
             ltgt = Map.unionWith Set.union lt gt
             result = case eq of
                        Just eqset -> Map.insertWith Set.union v'' eqset ltgt
-                       Nothing -> ltgt                     
-            lt = if inclt 
+                       Nothing -> ltgt
+            lt = if inclt
                  then lt'
                  else Map.empty
-            gt = if incgt 
+            gt = if incgt
                  then gt'
                  else Map.empty
             eq = if inceq

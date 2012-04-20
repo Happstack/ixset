@@ -8,7 +8,7 @@ This module defines 'Typeable' indexes and convenience functions. Should
 probably be considered private to "Data.IxSet".
 
 -}
-module Data.IxSet.Ix 
+module Data.IxSet.Ix
     ( Ix(..)
     , insert
     , delete
@@ -16,7 +16,7 @@ module Data.IxSet.Ix
     , deleteList
     , union
     , intersection
-    ) 
+    )
     where
 
 import           Data.Generics hiding (GT)
@@ -31,7 +31,7 @@ import qualified Data.Set   as Set
 
 -- | 'Ix' is a 'Map' from some 'Typeable' key to a 'Set' of values for
 -- that key.  'Ix' carries type information inside.
-data Ix a = forall key . (Typeable key, Ord key) => 
+data Ix a = forall key . (Typeable key, Ord key) =>
             Ix (Map key (Set a)) (a -> [key])
     deriving Typeable
 
@@ -95,6 +95,6 @@ union index1 index2 = Map.unionWith Set.union index1 index2
 -- | Takes the intersection of two sets.
 intersection :: (Ord a, Ord k)
              => Map k (Set a) -> Map k (Set a) -> Map k (Set a)
-intersection index1 index2 = Map.filter (not . Set.null) $ 
+intersection index1 index2 = Map.filter (not . Set.null) $
                              Map.intersectionWith Set.intersection index1 index2
 
