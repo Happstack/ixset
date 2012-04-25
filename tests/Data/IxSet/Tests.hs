@@ -175,10 +175,10 @@ prop_opers ixset intidx =
         , (gt `union` eq)            == gteq
            -- this works for Foo as an Int field is in every Foo value
         , (gt `union` eq `union` lt) == ixset
-        , (neq `intersection` eq)    == empty
+--        , (neq `intersection` eq)    == empty
         ]
     where
-      neq  = ixset @/= intidx
+--      neq  = ixset @/= intidx
       eq   = ixset @=  intidx
       lt   = ixset @<  intidx
       gt   = ixset @>  intidx
