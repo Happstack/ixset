@@ -1,5 +1,5 @@
 Name:                ixset
-Version:             1.0.3
+Version:             1.0.4
 Synopsis:            Efficient relational queries on Haskell sets.
 Description:
     Create and query sets that are indexed by multiple indices.
@@ -46,6 +46,9 @@ Library
   else
      ghc-options:      -Wall
   GHC-Prof-Options:    -auto-all
+{-
+
+Disable for now because it causes problems with older versions of Cabal.
 
 Test-Suite test-ixset
     Default-Language:    Haskell2010
@@ -60,3 +63,4 @@ Test-Suite test-ixset
                        ixset,
                        QuickCheck,
                        random
+-}
