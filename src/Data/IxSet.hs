@@ -50,7 +50,7 @@ to:
 >
 > instance Indexable Entry where
 >     empty = ixSet [ ...
->                     ixFun getWords
+>                   , ixFun getWords
 >                   ]
 
 Now you can do this query to find entries with any of the words:
@@ -74,7 +74,7 @@ index with this type.  Now you can do:
 > instance Indexable Entry where
 >     ...
 >     empty = ixSet [ ...
->                     ixFun getFirstAuthor
+>                   , ixFun getFirstAuthor
 >                   ]
 >
 >     entries @= (FirstAuthor "john@doe.com")  -- guess what this does
@@ -190,13 +190,16 @@ asProxyType a _ = a
 data IxSet a = IxSet [Ix a]
     deriving (Data, Typeable)
 
--- | Create an 'IxSet' using a list of indexes. Useful in the 'Indexable'
--- 'empty' method. Use 'ixFun' and 'ixGen' as list elements.
+-- | Create an 'IxSet' using a list of indexes. Typically used to
+-- create the 'empty' method for an 'Indexable' instance.
+--
+-- The list elements are generally created by using the 'ixFun' and
+-- 'ixGen' helper functions.
 --
 -- > instance Indexable Type where
 -- >     empty = ixSet [ ...
--- >                     ixFun getIndex1
--- >                     ixGen (Proxy :: Proxy Index2Type)
+-- >                   , ixFun getIndex1
+-- >                   , ixGen (Proxy :: Proxy Index2Type)
 -- >                   ]
 --
 -- Every value in the 'IxSet' must be reachable by the first index in this
