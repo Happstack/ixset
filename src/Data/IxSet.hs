@@ -258,6 +258,7 @@ instance ( SYBWC.Data ctx a
          , SYBWC.Data ctx [a]
          , SYBWC.Sat (ctx (IxSet a))
          , SYBWC.Sat (ctx [a])
+         , SYBWC.Typeable1 IxSet
          , Indexable a
          , Data a
          , Ord a

@@ -52,7 +52,7 @@ ixConstr = SYBWC.mkConstr ixDataType "Ix" [] SYBWC.Prefix
 ixDataType :: SYBWC.DataType
 ixDataType = SYBWC.mkDataType "Ix" [ixConstr]
 
-instance (SYBWC.Data ctx a, SYBWC.Sat (ctx (Ix a)))
+instance (SYBWC.Typeable1 Ix, SYBWC.Data ctx a, SYBWC.Sat (ctx (Ix a)))
        => SYBWC.Data ctx (Ix a) where
     gfoldl = error "gfoldl Ix"
     toConstr _ (Ix _ _)    = ixConstr
