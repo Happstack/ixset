@@ -44,4 +44,4 @@ Library
      ghc-options:      -Wall -fno-warn-unused-do-bind
   else
      ghc-options:      -Wall
-  GHC-Prof-Options:    -auto-all
+
