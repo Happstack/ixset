@@ -54,9 +54,9 @@ ixDataType = SYBWC.mkDataType "Ix" [ixConstr]
 
 instance (SYBWC.Typeable1 Ix, SYBWC.Data ctx a, SYBWC.Sat (ctx (Ix a)))
        => SYBWC.Data ctx (Ix a) where
-    gfoldl = error "gfoldl Ix"
+    gfoldl _ _ _ _ = error "gfoldl Ix" :: w (Ix a)
     toConstr _ (Ix _ _)    = ixConstr
-    gunfold = error "gunfold Ix"
+    gunfold _ _ _ _ = error "gunfold Ix" :: c (Ix a)
     dataTypeOf _ _ = ixDataType
 
 -- modification operations
