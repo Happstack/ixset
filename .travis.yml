@@ -25,8 +25,8 @@ matrix:
     - env: CABALVER=1.24 GHCVER=8.0.1
       compiler: ": #GHC 8.0.1"
       addons: {apt: {packages: [cabal-install-1.24,ghc-8.0.1], sources: [hvr-ghc]}}
-  allow_failure:
-    - env: CABALVER=1.24 GHCVER=8.0.1 # until syb-with-class is updated
+  allow_failure:  # until syb-with-class is updated
+    - env: CABALVER=1.24 GHCVER=8.0.1
       compiler: ": #GHC 8.0.1"
       addons: {apt: {packages: [cabal-install-1.24,ghc-8.0.1], sources: [hvr-ghc]}}
 
