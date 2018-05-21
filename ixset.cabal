@@ -1,5 +1,5 @@
 Name:                ixset
-Version:             1.0.7
+Version:             1.0.8
 Synopsis:            Efficient relational queries on Haskell sets.
 Description:
     Create and query sets that are indexed by multiple indices.
@@ -10,8 +10,8 @@ Maintainer:          Happstack team <happs@googlegroups.com>
 homepage:            http://happstack.com
 Category:            Data Structures
 Build-Type:          Simple
-Cabal-Version:       >= 1.8
-tested-with:         GHC == 7.6.3, GHC == 7.8.4, GHC == 7.10.3, GHC == 8.0.1
+Cabal-Version:       >= 2.0
+tested-with:         GHC == 7.6.3, GHC == 7.8.4, GHC == 7.10.3, GHC == 8.0.1, GHC == 8.4.2
 
 source-repository head
     type:     git
@@ -44,4 +44,18 @@ Library
      ghc-options:      -Wall -fno-warn-unused-do-bind
   else
      ghc-options:      -Wall
+  default-language: Haskell2010
 
+Test-Suite test-ixset
+    Default-Language:    Haskell2010
+    type: exitcode-stdio-1.0
+    main-is: Test.hs
+    other-modules: Data.IxSet.Tests
+    hs-source-dirs:    tests
+    build-depends:     base,
+                       Cabal >= 1.10,
+                       containers,
+                       HUnit,
+                       ixset,
+                       QuickCheck,
+                       random
