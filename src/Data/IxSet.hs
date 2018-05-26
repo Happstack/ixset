@@ -171,7 +171,7 @@ import           Data.Set       (Set)
 import qualified Data.Set       as Set
 import           Data.Typeable  (Typeable, cast, typeOf)
 import Language.Haskell.TH      as TH
-
+import           Data.Semigroup
 
 -------------------------------------------------
 -- Type proxies
