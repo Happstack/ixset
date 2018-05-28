@@ -135,6 +135,8 @@ module Data.IxSet
      (@>=<=),
      (@+),
      (@*),
+     getOrd,
+     getOrd2,
      getEQ,
      getLT,
      getGT,
