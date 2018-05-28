@@ -171,7 +171,7 @@ import           Data.Set       (Set)
 import qualified Data.Set       as Set
 import           Data.Typeable  (Typeable, cast, typeOf)
 import Language.Haskell.TH      as TH
-
+import           Data.Semigroup
 
 -------------------------------------------------
 -- Type proxies
@@ -258,7 +258,7 @@ instance ( SYBWC.Data ctx a
          , SYBWC.Data ctx [a]
          , SYBWC.Sat (ctx (IxSet a))
          , SYBWC.Sat (ctx [a])
-         , SYBWC.Typeable1 IxSet
+         , SYBWC.Typeable IxSet
          , Indexable a
          , Data a
          , Ord a
@@ -793,7 +793,9 @@ Optimization todo:
 * can we index on xpath rather than just type?
 
 --}
-
+instance (Indexable a, Typeable a, Ord a) => Semigroup (IxSet a) where
+    (<>) = union
+    
 instance (Indexable a, Typeable a, Ord a) => Monoid (IxSet a) where
     mempty = empty
     mappend = union
