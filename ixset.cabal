@@ -1,5 +1,5 @@
 Name:                ixset
-Version:             1.1.1
+Version:             1.1.1.1
 Synopsis:            Efficient relational queries on Haskell sets.
 Description:
     Create and query sets that are indexed by multiple indices.
@@ -11,7 +11,7 @@ homepage:            http://happstack.com
 Category:            Data Structures
 Build-Type:          Simple
 Cabal-Version:       >= 1.10
-tested-with:         GHC == 7.8.4, GHC == 7.10.3, GHC == 8.0.1, GHC == 8.0.2, GHC == 8.2.2, GHC == 8.4.3, GHC==8.6.1
+tested-with:         GHC == 7.8.4, GHC == 7.10.3, GHC == 8.0.1, GHC == 8.0.2, GHC == 8.2.2, GHC == 8.4.3, GHC==8.6.1, GHC==8.8.1
 
 source-repository head
     type:     git
@@ -21,7 +21,7 @@ Library
   Build-Depends:     base >=4.7 && < 5, syb
 
   if !impl(ghc >= 8.0)
-    build-depends: semigroups == 0.18.*
+    build-depends:     semigroups >= 0.18 && < 0.20
 
   Build-Depends:       containers >=0.5.5.1,
                        safecopy,

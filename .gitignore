@@ -1,2 +1,7 @@
 .ghc.environment*
 dist-newstyle
+.cabal-sandbox
+dist
+*~
+cabal.sandbox.config
+
