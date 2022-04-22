@@ -18,7 +18,7 @@ source-repository head
     location: https://github.com/Happstack/ixset.git
 
 Library
-  Build-Depends:     base >=4.7 && < 5, syb
+  Build-Depends:     base >=4.6 && < 5, syb
 
   if !impl(ghc >= 8.0)
     build-depends:     semigroups >= 0.18 && < 0.21

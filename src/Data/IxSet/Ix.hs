@@ -1,4 +1,4 @@
-{-# LANGUAGE UndecidableInstances, OverlappingInstances, FlexibleInstances,
+{-# LANGUAGE UndecidableInstances, OverlappingInstances, FlexibleContexts, FlexibleInstances,
              MultiParamTypeClasses, TemplateHaskell, PolymorphicComponents,
              DeriveDataTypeable,ExistentialQuantification #-}
 

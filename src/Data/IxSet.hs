@@ -1,4 +1,4 @@
-{-# LANGUAGE UndecidableInstances, OverlappingInstances, FlexibleInstances,
+{-# LANGUAGE UndecidableInstances, OverlappingInstances, FlexibleContexts, FlexibleInstances,
              MultiParamTypeClasses, TemplateHaskell, RankNTypes,
              FunctionalDependencies, DeriveDataTypeable,
              GADTs, CPP, ScopedTypeVariables #-}
@@ -367,8 +367,13 @@ inferIxSet ixset typeName calName entryPoints
                    getCalType (ForallT _names _ t') = getCalType t'
                    getCalType (AppT (AppT ArrowT _) t') = t'
                    getCalType t' = error ("Unexpected type in getCalType: " ++ pprint t')
+#if MIN_VERSION_template_haskell(2,17,0)
+                   binders' = map (fmap (\() -> SpecifiedSpec)) (binders :: [TyVarBndr ()])
+#else
+                   binders' = binders
+#endif
                    mkEntryPoint n = (conE 'Ix) `appE`
-                                    (sigE (varE 'Map.empty) (forallT binders (return context) $
+                                    (sigE (varE 'Map.empty) (forallT binders' (return context) $
                                                              appT (appT (conT ''Map) (conT n))
                                                                       (appT (conT ''Set) typeCon))) `appE`
                                     (varE 'flattenWithCalcs `appE` varE calName)
@@ -393,7 +398,11 @@ isSigD :: Dec -> Bool
 isSigD (SigD _ _) = True
 isSigD _ = False
 
-#if MIN_VERSION_template_haskell(2,4,0)
+#if MIN_VERSION_template_haskell(2,17,0)
+tyVarBndrToName :: TyVarBndr a -> Name
+tyVarBndrToName (PlainTV nm _) = nm
+tyVarBndrToName (KindedTV nm _ _) = nm
+#elif MIN_VERSION_template_haskell(2,4,0)
 tyVarBndrToName :: TyVarBndr -> Name
 tyVarBndrToName (PlainTV nm) = nm
 tyVarBndrToName (KindedTV nm _) = nm
