@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, TemplateHaskell, OverlappingInstances, UndecidableInstances, TemplateHaskell, KindSignatures #-}
+{-# LANGUAGE DeriveDataTypeable, TemplateHaskell, UndecidableInstances, TemplateHaskell, KindSignatures #-}
 
 -- Check that the SYBWC Data instance for IxSet works, by testing
 -- that going to and from XML works.

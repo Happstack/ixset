@@ -1,4 +1,4 @@
-{-# LANGUAGE UndecidableInstances, OverlappingInstances, FlexibleContexts, FlexibleInstances,
+{-# LANGUAGE UndecidableInstances, FlexibleContexts, FlexibleInstances,
              MultiParamTypeClasses, TemplateHaskell, PolymorphicComponents,
              DeriveDataTypeable,ExistentialQuantification #-}
 
@@ -21,11 +21,11 @@ module Data.IxSet.Ix
 
 import           Data.Generics hiding (GT)
 import qualified Data.Generics.SYB.WithClass.Basics as SYBWC
-import           Data.List  (foldl')
 import           Data.Map   (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Set   (Set)
 import qualified Data.Set   as Set
+import Data.Foldable (foldl')
 
 -- the core datatypes
 
@@ -52,8 +52,7 @@ ixConstr = SYBWC.mkConstr ixDataType "Ix" [] SYBWC.Prefix
 ixDataType :: SYBWC.DataType
 ixDataType = SYBWC.mkDataType "Ix" [ixConstr]
 
-instance (SYBWC.Typeable Ix, SYBWC.Data ctx a, SYBWC.Sat (ctx (Ix a)))
-       => SYBWC.Data ctx (Ix a) where
+instance (SYBWC.Sat (ctx (Ix a)), Typeable a) => SYBWC.Data ctx (Ix a) where
     gfoldl _ _ _ _ = error "gfoldl Ix" :: w (Ix a)
     toConstr _ (Ix _ _)    = ixConstr
     gunfold _ _ _ _ = error "gunfold Ix" :: c (Ix a)

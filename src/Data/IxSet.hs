@@ -1,4 +1,4 @@
-{-# LANGUAGE UndecidableInstances, OverlappingInstances, FlexibleContexts, FlexibleInstances,
+{-# LANGUAGE UndecidableInstances, FlexibleContexts, FlexibleInstances,
              MultiParamTypeClasses, TemplateHaskell, RankNTypes,
              FunctionalDependencies, DeriveDataTypeable,
              GADTs, CPP, ScopedTypeVariables #-}
@@ -86,7 +86,6 @@ module Data.IxSet
      -- * Set type
      IxSet,
      Indexable(..),
-     Proxy(..),
      noCalcs,
      inferIxSet,
      ixSet,
@@ -167,24 +166,33 @@ import qualified Data.List      as List
 import           Data.Map       (Map)
 import qualified Data.Map       as Map
 import           Data.Maybe     (fromMaybe)
-import           Data.Monoid    (Monoid(mempty, mappend))
 import           Data.SafeCopy  (SafeCopy(..), contain, safeGet, safePut)
 import           Data.Set       (Set)
 import qualified Data.Set       as Set
-import           Data.Typeable  (Typeable, cast, typeOf)
-import Language.Haskell.TH      as TH
-import           Data.Semigroup
-
--------------------------------------------------
--- Type proxies
-
-data Proxy a = Proxy
-
-mkProxy :: a -> Proxy a
-mkProxy _ = Proxy
-
-asProxyType :: a -> Proxy a -> a
-asProxyType a _ = a
+import           Data.Typeable  (Typeable, cast, typeOf, Proxy)
+import Language.Haskell.TH as TH
+    ( mkName,
+      varP,
+      varE,
+      conE,
+      appE,
+      listE,
+      sigE,
+      normalB,
+      valD,
+      varT,
+      conT,
+      appT,
+      Q,
+      Dec(TySynD, DataD, NewtypeD),
+      Name,
+      forallT,
+      tySynD,
+      instanceD,
+      reify,
+      Info(VarI, TyConI),
+      Specificity(SpecifiedSpec),
+      TyVarBndr(..) )
 
 -- the core datatypes
 
@@ -345,13 +353,13 @@ inferIxSet ixset typeName calName entryPoints
              names = map tyVarBndrToName binders
 
              typeCon = List.foldl' appT (conT typeName) (map varT names)
-#if MIN_VERSION_template_haskell(2,4,0)
-             mkCtx = classP
-#else
+#if MIN_VERSION_template_haskell(2,10,0)
              -- mkType :: Name -> [TypeQ] -> TypeQ
              mkType con = foldl appT (conT con)
 
              mkCtx = mkType
+#else
+             mkCtx = classP
 #endif
              dataCtxConQ = [mkCtx ''Data [varT name] | name <- names]
              fullContext = do
@@ -359,16 +367,13 @@ inferIxSet ixset typeName calName entryPoints
                 return (context ++ dataCtxCon)
          case calInfo of
 #if MIN_VERSION_template_haskell(2,11,0)
-           VarI _ t _ ->
+           VarI _ _ _ ->
 #else
            VarI _ t _ _ ->
 #endif
-               let calType = getCalType t
-                   getCalType (ForallT _names _ t') = getCalType t'
-                   getCalType (AppT (AppT ArrowT _) t') = t'
-                   getCalType t' = error ("Unexpected type in getCalType: " ++ pprint t')
+               let 
 #if MIN_VERSION_template_haskell(2,17,0)
-                   binders' = map (fmap (\() -> SpecifiedSpec)) (binders :: [TyVarBndr ()])
+                   binders' = map (fmap (\_ -> SpecifiedSpec)) binders
 #else
                    binders' = binders
 #endif
@@ -385,18 +390,7 @@ inferIxSet ixset typeName calName entryPoints
                      return $ [i, ixType']  -- ++ d
            _ -> error "IxSet.inferIxSet calInfo unexpected match"
 
--- | Version of 'instanceD' that takes in a Q [Dec] instead of a [Q Dec]
--- and filters out signatures from the list of declarations.
-instanceD' :: CxtQ -> TypeQ -> Q [Dec] -> DecQ
-instanceD' ctxt ty decs =
-    do decs' <- decs
-       let decs'' = filter (not . isSigD) decs'
-       instanceD ctxt ty (map return decs'')
 
--- | Returns true if the Dec matches a SigD constructor.
-isSigD :: Dec -> Bool
-isSigD (SigD _ _) = True
-isSigD _ = False
 
 #if MIN_VERSION_template_haskell(2,17,0)
 tyVarBndrToName :: TyVarBndr a -> Name
@@ -809,7 +803,6 @@ instance (Indexable a, Typeable a, Ord a) => Semigroup (IxSet a) where
     
 instance (Indexable a, Typeable a, Ord a) => Monoid (IxSet a) where
     mempty = empty
-    mappend = union
 
 -- | Statistics about 'IxSet'. This function returns quadruple
 -- consisting of 1. total number of elements in the set 2. number of
